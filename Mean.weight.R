@@ -169,7 +169,7 @@ if(Run=="First")
   Survey$bdays=Survey$fdays=Survey$nlines=NA
   Survey$BOTDEPTH=Survey$depthMax
   
-  #Drop some vars  #ACA
+  #Drop some vars  
   Keep=match(c("finyear","year","month","date","ZONE","BOTDEPTH","BOAT","fdays","Method","BLOCK","bdays",
                "hours","shots","nlines","NET_LENGTH","species","nfish","livewt","LAT","LONG","Source",
                "SHEET_NO","FL","Mid.Lat","Mid.Long"),names(Survey))
@@ -819,11 +819,15 @@ fn.fit=function(dat,BLKS,SPEC)
       model=lmer(log.weight~finyear+blockx+month+(1 |vessel), data = dat)
       
       #Terms deviance
-      Finyear.dev=deviance(lmer(log.weight~finyear+(1 |vessel), data = dat))
-      Block.dev=deviance(lmer(log.weight~finyear+blockx+(1 |vessel), data = dat))
-      Month.dev=deviance(model) 
-      Term.devs.mixed=data.frame(Term=c("Null model","finyear","blockx","month"),
-          deviance=c(deviance(null.model),Finyear.dev,Block.dev,Month.dev))
+      if(Run=="First")
+      {
+        Finyear.dev=deviance(lmer(log.weight~finyear+(1 |vessel), data = dat))
+        Block.dev=deviance(lmer(log.weight~finyear+blockx+(1 |vessel), data = dat))
+        Month.dev=deviance(model) 
+        Term.devs.mixed=data.frame(Term=c("Null model","finyear","blockx","month"),
+                                   deviance=c(deviance(null.model),Finyear.dev,Block.dev,Month.dev))
+        
+      }
     }
       
   if(SPEC%in%c(18003,18007))
@@ -831,21 +835,29 @@ fn.fit=function(dat,BLKS,SPEC)
       model=lmer(log.weight~finyear+blockx+month+depthMax+(1 |vessel), data = dat)
       
       #Terms deviance
-      Finyear.dev=deviance(lmer(log.weight~finyear+(1 |vessel), data = dat))
-      Block.dev=deviance(lmer(log.weight~finyear+blockx+(1 |vessel), data = dat))
-      Month.dev=deviance(lmer(log.weight~finyear+blockx+month+(1 |vessel), data = dat))
-      Depth.dev=deviance(model) 
-      Term.devs.mixed=data.frame(Term=c("Null model","finyear","blockx","month","depthMax"),
-          deviance=c(deviance(null.model),Finyear.dev,Block.dev,Month.dev,Depth.dev))
+      if(Run=="First")
+      {
+        Finyear.dev=deviance(lmer(log.weight~finyear+(1 |vessel), data = dat))
+        Block.dev=deviance(lmer(log.weight~finyear+blockx+(1 |vessel), data = dat))
+        Month.dev=deviance(lmer(log.weight~finyear+blockx+month+(1 |vessel), data = dat))
+        Depth.dev=deviance(model) 
+        Term.devs.mixed=data.frame(Term=c("Null model","finyear","blockx","month","depthMax"),
+                                   deviance=c(deviance(null.model),Finyear.dev,Block.dev,Month.dev,Depth.dev))
+        
+      }
     }
   
   #Overall deviance
-  Dev.exp= 100*abs((deviance(null.model) - deviance(model)) / deviance(null.model))
+  if(Run=="First")
+  {
+    Dev.exp= 100*abs((deviance(null.model) - deviance(model)) / deviance(null.model))
+  }
   
-  return(list(model=model,Dev.exp=Dev.exp,Term.devs.mixed=Term.devs.mixed,dat=dat))
+  if(Run=="First") return(list(model=model,Dev.exp=Dev.exp,Term.devs.mixed=Term.devs.mixed,dat=dat)) else
+    list(model=model,dat=dat)
 }
 
-Whis.fit=fn.fit(Agg.w.whiskery,Whis.blks,17003)
+Whis.fit=fn.fit(Agg.w.whiskery,Whis.blks,17003)  
 Gum.fit=fn.fit(Agg.w.gummy,Gum.blks,17001)
 Dus.fit=fn.fit(Agg.w.dusky,Dus.blks,18003)
 San.fit=fn.fit(Agg.w.sandbar,San.blks,18007)  
@@ -910,7 +922,6 @@ if(Run=="First")
   
   
 }
-
 
   #Survey
 if(Run=="First")
@@ -1044,8 +1055,6 @@ if(Run=="First")
   # }
 }
 
-
-
 #Model fit diagnostic plots
 if(Run=="First")
 {
@@ -1084,7 +1093,6 @@ if(Run=="First")
   
 }
 
-
 #Plot observations of mean annual weight
 if(Run=="First")
 {
@@ -1121,8 +1129,12 @@ if(Run=="First")
 }
 
 
-
 # Predicted annual mean weights
+
+#Blocks by zone
+Blk.zn=Logbook%>%select(zone,blockx)%>%
+                 distinct(blockx,.keep_all =T)%>%
+                filter(zone%in%c('West','Zone1','Zone2'))
 
 #create species data
   #Logbooks
@@ -1272,6 +1284,53 @@ Pred.gum=Predict.fn(Gum.fit$model,New.g,"Mixed",N.g)
 Pred.dus=Predict.fn(Dus.fit$model,New.d,"Mixed",N.d)
 Pred.san=Predict.fn(San.fit$model,New.s,"Mixed",N.s)
 
+  #Predict by zone 
+  #Whiskery
+dummy=fn.fit(subset(Agg.w.whiskery,zone=="West"),Whis.blks,17003)
+Pred.whis_west=Predict.fn(dummy$model,fn.new.dat(subset(Pred.dat.w,zone=="West"),w.vars),
+                          "Mixed",with(subset(Pred.dat.w,zone=="West"),table(finyear)))
+
+dummy=fn.fit(subset(Agg.w.whiskery,zone=="Zone1"),Whis.blks,17003)
+Pred.whis_zn1=Predict.fn(dummy$model,fn.new.dat(subset(Pred.dat.w,zone=="Zone1"),w.vars),
+                         "Mixed",with(subset(Pred.dat.w,zone=="Zone1"),table(finyear)))
+
+dummy=fn.fit(subset(Agg.w.whiskery,zone=="Zone2"),Whis.blks,17003)
+Pred.whis_zn2=Predict.fn(dummy$model,fn.new.dat(subset(Pred.dat.w,zone=="Zone2"),w.vars),
+                         "Mixed",with(subset(Pred.dat.w,zone=="Zone2"),table(finyear)))
+
+  #Gummy
+Pred.gum_zn2=Pred.gum  #only zone 2 data for gummy
+
+  #Dusky
+dummy=fn.fit(subset(Agg.w.dusky,zone=="West"),Dus.blks,18003)
+Pred.dus_west=Predict.fn(dummy$model,fn.new.dat(subset(Pred.dat.d,zone=="West"),d.vars),
+                          "Mixed",with(subset(Pred.dat.d,zone=="West"),table(finyear)))
+
+dummy=fn.fit(subset(Agg.w.dusky,zone=="Zone1"),Dus.blks,18003)
+Pred.dus_zn1=Predict.fn(dummy$model,fn.new.dat(subset(Pred.dat.d,zone=="Zone1"),d.vars),
+                         "Mixed",with(subset(Pred.dat.d,zone=="Zone1"),table(finyear)))
+
+dummy=fn.fit(subset(Agg.w.dusky,zone=="Zone2"),Dus.blks,18003)
+Pred.dus_zn2=Predict.fn(dummy$model,fn.new.dat(subset(Pred.dat.d,zone=="Zone2"),d.vars),
+                        "Mixed",with(subset(Pred.dat.d,zone=="Zone2"),table(finyear)))
+
+
+
+  #Sandbar
+dummy=fn.fit(subset(Agg.w.sandbar,zone=="West"),San.blks,18007)
+Pred.san_west=Predict.fn(dummy$model,fn.new.dat(subset(Pred.dat.s,zone=="West"),s.vars),
+                         "Mixed",with(subset(Pred.dat.s,zone=="West"),table(finyear)))
+
+dummy=fn.fit(subset(Agg.w.sandbar,zone=="Zone1"),San.blks,18007)
+Pred.san_zn1=Predict.fn(dummy$model,fn.new.dat(subset(Pred.dat.s,zone=="Zone1"),s.vars),
+                         "Mixed",with(subset(Pred.dat.s,zone=="Zone1"),table(finyear)))
+
+
+
+
+
+
+rm(dummy)
 
     #Survey
 if(Run=="First")
@@ -1903,7 +1962,6 @@ if(Run=="First")
 
 # EXPORT QUANTITIES OF INTEREST FOR POP DYN MODEL -------------------------
 setwd('C:\\Matias\\Analyses\\Data_outs')
-par(mfcol=c(2,2),mar=c(1,4,2,.1),oma=c(3,1,.1,.1),las=1,mgp=c(.1,.9,0))
 
 #normalise
 Pred.gum=Pred.gum%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%
@@ -1919,3 +1977,26 @@ write.csv(Pred.gum,"Gummy Shark.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.dus,"Dusky Shark.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.whis,"Whiskery Shark.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.san,"Sandbar Shark.annual.mean.size_relative.csv",row.names = F)
+
+
+#by zone
+fn.out=function(LisT,NM)
+{
+  for(l in 1:length(LisT))
+  {
+   write.csv(LisT[[l]]%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%
+                select(Finyear,mean,CV),
+              paste(NM,".annual.mean.size_relative_",names(LisT)[l],".csv",sep=""),row.names = F)
+  }
+}
+
+fn.out(list(west=Pred.whis_west,zone1=Pred.whis_zn1,zone2=Pred.whis_zn2),
+       NM="Whiskery Shark")
+fn.out(list(zone2=Pred.gum_zn2),NM="Gummy Shark")
+fn.out(list(west=Pred.dus_west,zone1=Pred.dus_zn1,zone2=Pred.dus_zn2),
+       NM="Dusky Shark")
+fn.out(list(west=Pred.san_west,zone1=Pred.san_zn1),NM="Sandbar Shark")
+
+
+
+
