@@ -19,8 +19,8 @@ setwd("C:/Matias/Analyses/Catch and effort")
 #1. DAILY LOGBOOKS
 Logbook=read.csv("Logbook.data.mean.weight.csv")
 
-Wei.range=read.csv("C:/Matias/Data/Length_Weights/Data.Ranges.csv")
-Wei.range.names=read.csv("C:/Matias/Data/Length_Weights/Species.names.csv")
+Wei.range=read.csv("C:/Matias/Data/Length_Weights/Data.Ranges.csv",stringsAsFactors = F)
+Wei.range.names=read.csv("C:/Matias/Data/Length_Weights/Species.names.csv",stringsAsFactors = F)
 Wei.range=merge(Wei.range,Wei.range.names,by="Sname",all.x=T)
 
 
@@ -78,11 +78,27 @@ Min.w.s=bwt.s*55^awt.s
 Min.w.w=bwt.w*25^awt.w
 Min.w.g=bwt.g*30^awt.g
 
+
+#Other species
+Max.w.wob=subset(Wei.range,Sname=='Wobbegong (general)')$TW.max
+Min.w.wob=subset(Wei.range,Sname=='Wobbegong (general)')$TW.min
+
+Max.w.sH=subset(Wei.range,Sname=='Smooth Hammerhead')$TW.max
+Min.w.sH=subset(Wei.range,Sname=='Smooth Hammerhead')$TW.min
+
+Max.w.Sp=subset(Wei.range,Sname=='Blacktip, Longnose Grey, Spinner Shark')$TW.max
+Min.w.Sp=subset(Wei.range,Sname=='Blacktip, Longnose Grey, Spinner Shark')$TW.min
+
+Max.w.Tig=subset(Wei.range,Sname=='Tiger Shark')$TW.max
+Min.w.Tig=subset(Wei.range,Sname=='Tiger Shark')$TW.min
+
+
 #Species ranges
 Dusky.range=c(-28,120)
 Sandbar.range=c(-26,118)
 Whiskery.range=c(-28,129)
 Gummy.range=c(116,129)
+
 
 
 
@@ -115,6 +131,13 @@ Mean.w.whiskery=subset(Logbook,LAT <= Whiskery.range[1] & LONG <= Whiskery.range
 Mean.w.gummy=subset(Logbook,LONG >= Gummy.range[1]  & LONG <= Gummy.range[2]  & LAT <=(-30))
 Mean.w.dusky=subset(Logbook,LAT <= Dusky.range[1]  & LONG <= Dusky.range[2] )
 Mean.w.sandbar=subset(Logbook,LAT <= Sandbar.range[1] & LONG <= Sandbar.range[2] )
+
+  #Core dist for other species with data
+Other.species=c(19000,18023,18022)
+Mean.w.smooth.HH=subset(Logbook,species== 19000 & LAT <=(-33))
+Mean.w.Spinner=subset(Logbook,species== 18023 & LONG <120 )
+Mean.w.Tiger=subset(Logbook,species== 18022 & LONG <116  )
+
 
 
 #2. Create survey datasets
@@ -332,8 +355,6 @@ if(Run=="First")
 }
 
 
-
-
 #Table of numbers by species
 if(Run=="First")
 {
@@ -401,7 +422,6 @@ if(Run=="First")
 }
 
 
-
 #Create data sets for analysis
 data.fn=function(dat,MAX.w,MIN.w)
 {
@@ -413,6 +433,11 @@ Agg.w.whiskery=data.fn(subset(Mean.w.whiskery,species==17003),Max.w.w,Min.w.w)
 Agg.w.gummy=data.fn(subset(Mean.w.gummy,species==17001),Max.w.g,Min.w.g)
 Agg.w.dusky=data.fn(subset(Mean.w.dusky,species==18003),Max.w.d,Min.w.d)
 Agg.w.sandbar=data.fn(subset(Mean.w.sandbar,species==18007),Max.w.s,Min.w.s)
+
+Agg.w.smooth.HH=data.fn(Mean.w.smooth.HH,Max.w.sH,Min.w.sH)
+Agg.w.Spinner=data.fn(Mean.w.Spinner,Max.w.Sp,Min.w.Sp)
+Agg.w.Tiger=data.fn(Mean.w.Tiger,Max.w.Tig,Min.w.Tig)
+
 
 if(Run=="First")
 {
@@ -598,11 +623,16 @@ fn.block.cum=function(dat,SPEC,Threshold,MAX.W,MIN.W)
   This.blk=subset(TABLE13,PerCumCatch<=Threshold)
   return(This.blk$blockx)
 }
-
 Whis.blks=fn.block.cum(Agg.w.whiskery,17003,Threshold,Max.w.w,Min.w.w)
 Gum.blks=fn.block.cum(Agg.w.gummy,17001,Threshold,Max.w.g,Min.w.g)
 Dus.blks=fn.block.cum(Agg.w.dusky,18003,Threshold,Max.w.d,Min.w.d)
 San.blks=fn.block.cum(Agg.w.sandbar,18007,Threshold,Max.w.s,Min.w.s)
+
+SH.blks=fn.block.cum(Agg.w.smooth.HH,19000,Threshold,Max.w.sH,Min.w.sH)
+Spin.blks=fn.block.cum(Agg.w.Spinner,18023,Threshold,Max.w.Sp,Min.w.Sp)
+Tig.blks=fn.block.cum(Agg.w.Tiger,18022,Threshold,Max.w.Tig,Min.w.Tig)
+
+ 
 
 if(Run=="First")
 {
@@ -738,6 +768,12 @@ Gum.fit=fn.best.mod(subset(Agg.w.gummy,blockx%in%Gum.blks),"Mixed")
 Dus.fit=fn.best.mod(subset(Agg.w.dusky,blockx%in%Dus.blks),"Mixed")
 San.fit=fn.best.mod(subset(Agg.w.sandbar,blockx%in%San.blks),"Mixed")  
 
+SmH.fit=fn.best.mod(subset(Agg.w.smooth.HH,blockx%in%SH.blks),"Mixed") 
+Spi.fit=fn.best.mod(subset(Agg.w.Spinner,blockx%in%Spin.blks),"Mixed") 
+Tig.fit=fn.best.mod(subset(Agg.w.Tiger,blockx%in%Tig.blks),"Mixed") 
+
+
+
 if(Run=="First")
 {
   fn.best.mod=function(dat)
@@ -792,7 +828,7 @@ if(Run=="First")
 Model.type="Mixed"
 
   #Logbook
-fn.fit=function(dat,BLKS,SPEC)
+fn.fit=function(dat,BLKS,SPEC,Formula)
 {
   dat=subset(dat,blockx%in%BLKS)
   
@@ -814,8 +850,12 @@ fn.fit=function(dat,BLKS,SPEC)
   
   Term.devs.mixed=NA
   null.model=lmer(log.weight~1+(1 |vessel), data = dat)
-  if(SPEC%in%c(17001,17003))
+  model=eval(Formula)
+  
+  if(Run=="First")
   {
+    if(SPEC%in%c(17001,17003))
+    {
       model=lmer(log.weight~finyear+blockx+month+(1 |vessel), data = dat)
       
       #Terms deviance
@@ -829,9 +869,9 @@ fn.fit=function(dat,BLKS,SPEC)
         
       }
     }
-      
-  if(SPEC%in%c(18003,18007))
-  {
+    
+    if(SPEC%in%c(18003,18007))
+    {
       model=lmer(log.weight~finyear+blockx+month+depthMax+(1 |vessel), data = dat)
       
       #Terms deviance
@@ -846,6 +886,8 @@ fn.fit=function(dat,BLKS,SPEC)
         
       }
     }
+  }
+
   
   #Overall deviance
   if(Run=="First")
@@ -857,10 +899,14 @@ fn.fit=function(dat,BLKS,SPEC)
     list(model=model,dat=dat)
 }
 
-Whis.fit=fn.fit(Agg.w.whiskery,Whis.blks,17003)  
-Gum.fit=fn.fit(Agg.w.gummy,Gum.blks,17001)
-Dus.fit=fn.fit(Agg.w.dusky,Dus.blks,18003)
-San.fit=fn.fit(Agg.w.sandbar,San.blks,18007)  
+Whis.fit=fn.fit(Agg.w.whiskery,Whis.blks,17003,Whis.fit)  
+Gum.fit=fn.fit(Agg.w.gummy,Gum.blks,17001,Gum.fit)
+Dus.fit=fn.fit(Agg.w.dusky,Dus.blks,18003,Dus.fit)
+San.fit=fn.fit(Agg.w.sandbar,San.blks,18007,San.fit)  
+
+SmH.fit=fn.fit(Agg.w.smooth.HH,SH.blks,19000,SmH.fit) 
+Spi.fit=fn.fit(Agg.w.Spinner,Spin.blks,18023,Spi.fit) 
+Tig.fit=fn.fit(Agg.w.Tiger,Tig.blks,18022,Tig.fit) 
 
 
     #Dev. explained by model
@@ -1147,6 +1193,13 @@ N.g=table(Pred.dat.g$finyear)
 N.d=table(Pred.dat.d$finyear)
 N.s=table(Pred.dat.s$finyear)
 
+Pred.dat.smh=subset(Agg.w.smooth.HH,blockx%in%SH.blks)
+Pred.dat.spi=subset(Agg.w.Spinner,blockx%in%Spin.blks)
+Pred.dat.tig=subset(Agg.w.Tiger,blockx%in%Tig.blks)
+N.smh=table(Pred.dat.smh$finyear)
+N.spi=table(Pred.dat.spi$finyear)
+N.tig=table(Pred.dat.tig$finyear)
+
   #Survey
 if(Run=="First")
 {
@@ -1273,28 +1326,44 @@ Predict.fn=function(model,NEWdata,Model.type,N)
   #predict new data
 
     #Logbook
-w.vars=g.vars=c("finyear","blockx","month","vessel")
-d.vars=s.vars=c("finyear","blockx","month","vessel","depthMax")
+#w.vars=g.vars=c("finyear","blockx","month","vessel")
+#d.vars=s.vars=c("finyear","blockx","month","vessel","depthMax")
+
+le.vars=c("finyear","blockx","month","vessel","depthMax")
+w.vars=g.vars=d.vars=s.vars=le.vars
 New.w=fn.new.dat(Pred.dat.w,w.vars)
 New.g=fn.new.dat(Pred.dat.g,g.vars)
 New.d=fn.new.dat(Pred.dat.d,d.vars)
 New.s=fn.new.dat(Pred.dat.s,s.vars)
+
+New.smh=fn.new.dat(Pred.dat.smh,le.vars)
+New.spi=fn.new.dat(Pred.dat.spi,le.vars)
+New.tig=fn.new.dat(Pred.dat.tig,le.vars)
+
 Pred.whis=Predict.fn(Whis.fit$model,New.w,"Mixed",N.w)
 Pred.gum=Predict.fn(Gum.fit$model,New.g,"Mixed",N.g)
 Pred.dus=Predict.fn(Dus.fit$model,New.d,"Mixed",N.d)
 Pred.san=Predict.fn(San.fit$model,New.s,"Mixed",N.s)
 
+Pred.smh=Predict.fn(SmH.fit$model,New.smh,"Mixed",N.smh)
+Pred.spi=Predict.fn(Spi.fit$model,New.spi,"Mixed",N.spi)
+Pred.tig=Predict.fn(Tig.fit$model,New.tig,"Mixed",N.tig)
+
+ 
+ 
+
+
   #Predict by zone 
   #Whiskery
-dummy=fn.fit(subset(Agg.w.whiskery,zone=="West"),Whis.blks,17003)
+dummy=fn.fit(subset(Agg.w.whiskery,zone=="West"),Whis.blks,17003,Whis.fit$model@call)
 Pred.whis_west=Predict.fn(dummy$model,fn.new.dat(subset(Pred.dat.w,zone=="West"),w.vars),
                           "Mixed",with(subset(Pred.dat.w,zone=="West"),table(finyear)))
 
-dummy=fn.fit(subset(Agg.w.whiskery,zone=="Zone1"),Whis.blks,17003)
+dummy=fn.fit(subset(Agg.w.whiskery,zone=="Zone1"),Whis.blks,17003,Whis.fit$model@call)
 Pred.whis_zn1=Predict.fn(dummy$model,fn.new.dat(subset(Pred.dat.w,zone=="Zone1"),w.vars),
                          "Mixed",with(subset(Pred.dat.w,zone=="Zone1"),table(finyear)))
 
-dummy=fn.fit(subset(Agg.w.whiskery,zone=="Zone2"),Whis.blks,17003)
+dummy=fn.fit(subset(Agg.w.whiskery,zone=="Zone2"),Whis.blks,17003,Whis.fit$model@call)
 Pred.whis_zn2=Predict.fn(dummy$model,fn.new.dat(subset(Pred.dat.w,zone=="Zone2"),w.vars),
                          "Mixed",with(subset(Pred.dat.w,zone=="Zone2"),table(finyear)))
 
@@ -1302,33 +1371,28 @@ Pred.whis_zn2=Predict.fn(dummy$model,fn.new.dat(subset(Pred.dat.w,zone=="Zone2")
 Pred.gum_zn2=Pred.gum  #only zone 2 data for gummy
 
   #Dusky
-dummy=fn.fit(subset(Agg.w.dusky,zone=="West"),Dus.blks,18003)
+dummy=fn.fit(subset(Agg.w.dusky,zone=="West"),Dus.blks,18003,Dus.fit$model@call)
 Pred.dus_west=Predict.fn(dummy$model,fn.new.dat(subset(Pred.dat.d,zone=="West"),d.vars),
                           "Mixed",with(subset(Pred.dat.d,zone=="West"),table(finyear)))
 
-dummy=fn.fit(subset(Agg.w.dusky,zone=="Zone1"),Dus.blks,18003)
+dummy=fn.fit(subset(Agg.w.dusky,zone=="Zone1"),Dus.blks,18003,Dus.fit$model@call)
 Pred.dus_zn1=Predict.fn(dummy$model,fn.new.dat(subset(Pred.dat.d,zone=="Zone1"),d.vars),
                          "Mixed",with(subset(Pred.dat.d,zone=="Zone1"),table(finyear)))
 
-dummy=fn.fit(subset(Agg.w.dusky,zone=="Zone2"),Dus.blks,18003)
+dummy=fn.fit(subset(Agg.w.dusky,zone=="Zone2"),Dus.blks,18003,Dus.fit$model@call)
 Pred.dus_zn2=Predict.fn(dummy$model,fn.new.dat(subset(Pred.dat.d,zone=="Zone2"),d.vars),
                         "Mixed",with(subset(Pred.dat.d,zone=="Zone2"),table(finyear)))
 
 
 
   #Sandbar
-dummy=fn.fit(subset(Agg.w.sandbar,zone=="West"),San.blks,18007)
+dummy=fn.fit(subset(Agg.w.sandbar,zone=="West"),San.blks,18007,San.fit$model@call)
 Pred.san_west=Predict.fn(dummy$model,fn.new.dat(subset(Pred.dat.s,zone=="West"),s.vars),
                          "Mixed",with(subset(Pred.dat.s,zone=="West"),table(finyear)))
 
-dummy=fn.fit(subset(Agg.w.sandbar,zone=="Zone1"),San.blks,18007)
+dummy=fn.fit(subset(Agg.w.sandbar,zone=="Zone1"),San.blks,18007,San.fit$model@call)
 Pred.san_zn1=Predict.fn(dummy$model,fn.new.dat(subset(Pred.dat.s,zone=="Zone1"),s.vars),
                          "Mixed",with(subset(Pred.dat.s,zone=="Zone1"),table(finyear)))
-
-
-
-
-
 
 rm(dummy)
 
@@ -1977,6 +2041,18 @@ write.csv(Pred.gum,"Gummy Shark.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.dus,"Dusky Shark.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.whis,"Whiskery Shark.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.san,"Sandbar Shark.annual.mean.size_relative.csv",row.names = F)
+
+  
+Pred.smh=Pred.smh%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%
+                  select(Finyear,mean,CV)
+Pred.spi=Pred.spi%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%
+                  select(Finyear,mean,CV)
+Pred.tig=Pred.tig%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%
+                  select(Finyear,mean,CV)
+
+write.csv(Pred.smh,"Smooth hammerhead.annual.mean.size_relative.csv",row.names = F)
+write.csv(Pred.spi,"Spinner Shark.annual.mean.size_relative.csv",row.names = F)
+write.csv(Pred.tig,"Tiger Shark.annual.mean.size_relative.csv",row.names = F)
 
 
 #by zone
