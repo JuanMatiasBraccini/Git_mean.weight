@@ -2028,14 +2028,10 @@ if(Run=="First")
 setwd('C:\\Matias\\Analyses\\Data_outs')
 
 #normalise
-Pred.gum=Pred.gum%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%
-                    select(Finyear,mean,CV)
-Pred.dus=Pred.dus%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%
-                    select(Finyear,mean,CV)
-Pred.whis=Pred.whis%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%
-                      select(Finyear,mean,CV)
-Pred.san=Pred.san%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%
-                    select(Finyear,mean,CV)
+Pred.gum=Pred.gum%>%mutate(mean=Pred.mean/mean(Pred.mean))
+Pred.dus=Pred.dus%>%mutate(mean=Pred.mean/mean(Pred.mean))
+Pred.whis=Pred.whis%>%mutate(mean=Pred.mean/mean(Pred.mean))
+Pred.san=Pred.san%>%mutate(mean=Pred.mean/mean(Pred.mean))
 
 write.csv(Pred.gum,"Gummy Shark.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.dus,"Dusky Shark.annual.mean.size_relative.csv",row.names = F)
@@ -2043,12 +2039,9 @@ write.csv(Pred.whis,"Whiskery Shark.annual.mean.size_relative.csv",row.names = F
 write.csv(Pred.san,"Sandbar Shark.annual.mean.size_relative.csv",row.names = F)
 
   
-Pred.smh=Pred.smh%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%
-                  select(Finyear,mean,CV)
-Pred.spi=Pred.spi%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%
-                  select(Finyear,mean,CV)
-Pred.tig=Pred.tig%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%
-                  select(Finyear,mean,CV)
+Pred.smh=Pred.smh%>%mutate(mean=Pred.mean/mean(Pred.mean))
+Pred.spi=Pred.spi%>%mutate(mean=Pred.mean/mean(Pred.mean))
+Pred.tig=Pred.tig%>%mutate(mean=Pred.mean/mean(Pred.mean))
 
 write.csv(Pred.smh,"Smooth hammerhead.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.spi,"Spinner Shark.annual.mean.size_relative.csv",row.names = F)
