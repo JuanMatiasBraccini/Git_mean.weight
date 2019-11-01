@@ -2027,22 +2027,17 @@ if(Run=="First")
 # EXPORT QUANTITIES OF INTEREST FOR POP DYN MODEL -------------------------
 setwd('C:\\Matias\\Analyses\\Data_outs')
 
-#normalise
-Pred.gum=Pred.gum%>%mutate(mean=Pred.mean/mean(Pred.mean))
-Pred.dus=Pred.dus%>%mutate(mean=Pred.mean/mean(Pred.mean))
-Pred.whis=Pred.whis%>%mutate(mean=Pred.mean/mean(Pred.mean))
-Pred.san=Pred.san%>%mutate(mean=Pred.mean/mean(Pred.mean))
-
-write.csv(Pred.gum,"Gummy Shark.annual.mean.size_relative.csv",row.names = F)
-write.csv(Pred.dus,"Dusky Shark.annual.mean.size_relative.csv",row.names = F)
-write.csv(Pred.whis,"Whiskery Shark.annual.mean.size_relative.csv",row.names = F)
-write.csv(Pred.san,"Sandbar Shark.annual.mean.size_relative.csv",row.names = F)
+#normalised
+write.csv(Pred.gum%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
+          "Gummy Shark.annual.mean.size_relative.csv",row.names = F)
+write.csv(Pred.dus%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
+          "Dusky Shark.annual.mean.size_relative.csv",row.names = F)
+write.csv(Pred.whis%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
+          "Whiskery Shark.annual.mean.size_relative.csv",row.names = F)
+write.csv(Pred.san%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
+          "Sandbar Shark.annual.mean.size_relative.csv",row.names = F)
 
   
-Pred.smh=Pred.smh%>%mutate(mean=Pred.mean/mean(Pred.mean))
-Pred.spi=Pred.spi%>%mutate(mean=Pred.mean/mean(Pred.mean))
-Pred.tig=Pred.tig%>%mutate(mean=Pred.mean/mean(Pred.mean))
-
 write.csv(Pred.smh,"Smooth hammerhead.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.spi,"Spinner Shark.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.tig,"Tiger Shark.annual.mean.size_relative.csv",row.names = F)
