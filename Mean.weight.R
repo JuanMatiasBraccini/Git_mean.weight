@@ -1350,7 +1350,10 @@ Pred.spi=Predict.fn(Spi.fit$model,New.spi,"Mixed",N.spi)
 Pred.tig=Predict.fn(Tig.fit$model,New.tig,"Mixed",N.tig)
 
  
- 
+ #add sample size
+Pred.smh$n=SmH.fit$dat%>%group_by(finyear)%>%summarise(n=n())%>%pull(n)
+Pred.spi$n=Spi.fit$dat%>%group_by(finyear)%>%summarise(n=n())%>%pull(n)
+Pred.tig$n=Tig.fit$dat%>%group_by(finyear)%>%summarise(n=n())%>%pull(n)
 
 
   #Predict by zone 
