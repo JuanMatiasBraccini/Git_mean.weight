@@ -93,11 +93,11 @@ Max.w.Tig=subset(Wei.range,Sname=='Tiger Shark')$TW.max
 Min.w.Tig=subset(Wei.range,Sname=='Tiger Shark')$TW.min
 
 
-#Species ranges
-Dusky.range=c(-28,120)
-Sandbar.range=c(-26,118)
-Whiskery.range=c(-28,129)
-Gummy.range=c(116,129)
+#Species ranges (as per CPUE standardisation)
+Dusky.range=c(-28,128)
+Sandbar.range=c(-27,117)
+Whiskery.range=c(-29,128)
+Gummy.range=c(115,129)
 
 
 
@@ -133,10 +133,11 @@ Mean.w.dusky=subset(Logbook,LAT <= Dusky.range[1]  & LONG <= Dusky.range[2] )
 Mean.w.sandbar=subset(Logbook,LAT <= Sandbar.range[1] & LONG <= Sandbar.range[2] )
 
   #Core dist for other species with data
-Other.species=c(19000,18023,18022)
-Mean.w.smooth.HH=subset(Logbook,species== 19000 & LAT <=(-33))
-Mean.w.Spinner=subset(Logbook,species== 18023 & LONG <120 )
-Mean.w.Tiger=subset(Logbook,species== 18022 & LONG <116  )
+Other.species=c(19000,18023,18022,18001)
+Mean.w.smooth.HH=subset(Logbook,species== 19000 & LONG>=115 & LONG<=128 & LAT<=(-32) & LAT>=(-35))
+Mean.w.Spinner=subset(Logbook,species== 18023 & LONG>=113 & LONG<=119 & LAT<=(-27) & LAT>=(-35))
+Mean.w.Tiger=subset(Logbook,species== 18022 & LONG>=113 & LONG<=116 & LAT<=(-27) & LAT>=(-34))
+Mean.w.Copper=subset(Logbook,species== 18001 & LONG>=115 & LONG<=129 & LAT<=(-31) & LAT>=(-35))
 
 
 
@@ -437,6 +438,7 @@ Agg.w.sandbar=data.fn(subset(Mean.w.sandbar,species==18007),Max.w.s,Min.w.s)
 Agg.w.smooth.HH=data.fn(Mean.w.smooth.HH,Max.w.sH,Min.w.sH)
 Agg.w.Spinner=data.fn(Mean.w.Spinner,Max.w.Sp,Min.w.Sp)
 Agg.w.Tiger=data.fn(Mean.w.Tiger,Max.w.Tig,Min.w.Tig)
+Agg.w.Copper=data.fn(Mean.w.Copper,Max.w.d,Min.w.d)
 
 
 if(Run=="First")
@@ -631,6 +633,7 @@ San.blks=fn.block.cum(Agg.w.sandbar,18007,Threshold,Max.w.s,Min.w.s)
 SH.blks=fn.block.cum(Agg.w.smooth.HH,19000,Threshold,Max.w.sH,Min.w.sH)
 Spin.blks=fn.block.cum(Agg.w.Spinner,18023,Threshold,Max.w.Sp,Min.w.Sp)
 Tig.blks=fn.block.cum(Agg.w.Tiger,18022,Threshold,Max.w.Tig,Min.w.Tig)
+Cop.blks=fn.block.cum(Agg.w.Copper,18001,Threshold,Max.w.d,Min.w.d)
 
  
 
@@ -770,7 +773,8 @@ San.fit=fn.best.mod(subset(Agg.w.sandbar,blockx%in%San.blks),"Mixed")
 
 SmH.fit=fn.best.mod(subset(Agg.w.smooth.HH,blockx%in%SH.blks),"Mixed") 
 Spi.fit=fn.best.mod(subset(Agg.w.Spinner,blockx%in%Spin.blks),"Mixed") 
-Tig.fit=fn.best.mod(subset(Agg.w.Tiger,blockx%in%Tig.blks),"Mixed") 
+Tig.fit=fn.best.mod(subset(Agg.w.Tiger,blockx%in%Tig.blks),"Mixed")
+Cop.fit=fn.best.mod(subset(Agg.w.Copper,blockx%in%Cop.blks),"Mixed")
 
 
 
@@ -906,7 +910,8 @@ San.fit=fn.fit(Agg.w.sandbar,San.blks,18007,San.fit)
 
 SmH.fit=fn.fit(Agg.w.smooth.HH,SH.blks,19000,SmH.fit) 
 Spi.fit=fn.fit(Agg.w.Spinner,Spin.blks,18023,Spi.fit) 
-Tig.fit=fn.fit(Agg.w.Tiger,Tig.blks,18022,Tig.fit) 
+Tig.fit=fn.fit(Agg.w.Tiger,Tig.blks,18022,Tig.fit)
+Cop.fit=fn.fit(Agg.w.Copper,Cop.blks,18001,Cop.fit)
 
 
     #Dev. explained by model
@@ -1188,6 +1193,7 @@ Pred.dat.w=subset(Agg.w.whiskery,blockx%in%Whis.blks)
 Pred.dat.g=subset(Agg.w.gummy,blockx%in%Gum.blks)
 Pred.dat.d=subset(Agg.w.dusky,blockx%in%Dus.blks)
 Pred.dat.s=subset(Agg.w.sandbar,blockx%in%San.blks)
+
 N.w=table(Pred.dat.w$finyear)
 N.g=table(Pred.dat.g$finyear)
 N.d=table(Pred.dat.d$finyear)
@@ -1196,9 +1202,13 @@ N.s=table(Pred.dat.s$finyear)
 Pred.dat.smh=subset(Agg.w.smooth.HH,blockx%in%SH.blks)
 Pred.dat.spi=subset(Agg.w.Spinner,blockx%in%Spin.blks)
 Pred.dat.tig=subset(Agg.w.Tiger,blockx%in%Tig.blks)
+Pred.dat.cop=subset(Agg.w.Copper,blockx%in%Cop.blks)
+
 N.smh=table(Pred.dat.smh$finyear)
 N.spi=table(Pred.dat.spi$finyear)
 N.tig=table(Pred.dat.tig$finyear)
+N.cop=table(Pred.dat.cop$finyear)
+
 
   #Survey
 if(Run=="First")
@@ -1339,6 +1349,7 @@ New.s=fn.new.dat(Pred.dat.s,s.vars)
 New.smh=fn.new.dat(Pred.dat.smh,le.vars)
 New.spi=fn.new.dat(Pred.dat.spi,le.vars)
 New.tig=fn.new.dat(Pred.dat.tig,le.vars)
+New.cop=fn.new.dat(Pred.dat.cop,le.vars)
 
 Pred.whis=Predict.fn(Whis.fit$model,New.w,"Mixed",N.w)
 Pred.gum=Predict.fn(Gum.fit$model,New.g,"Mixed",N.g)
@@ -1348,12 +1359,14 @@ Pred.san=Predict.fn(San.fit$model,New.s,"Mixed",N.s)
 Pred.smh=Predict.fn(SmH.fit$model,New.smh,"Mixed",N.smh)
 Pred.spi=Predict.fn(Spi.fit$model,New.spi,"Mixed",N.spi)
 Pred.tig=Predict.fn(Tig.fit$model,New.tig,"Mixed",N.tig)
+Pred.cop=Predict.fn(Cop.fit$model,New.cop,"Mixed",N.cop)
 
  
  #add sample size
 Pred.smh$n=SmH.fit$dat%>%group_by(finyear)%>%summarise(n=n())%>%pull(n)
 Pred.spi$n=Spi.fit$dat%>%group_by(finyear)%>%summarise(n=n())%>%pull(n)
 Pred.tig$n=Tig.fit$dat%>%group_by(finyear)%>%summarise(n=n())%>%pull(n)
+Pred.cop$n=Cop.fit$dat%>%group_by(finyear)%>%summarise(n=n())%>%pull(n)
 
 
   #Predict by zone 
@@ -2032,18 +2045,23 @@ setwd('C:\\Matias\\Analyses\\Data_outs')
 
 #normalised
 write.csv(Pred.gum%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "Gummy Shark.annual.mean.size_relative.csv",row.names = F)
+          "C:/Matias/Analyses/Data_outs/Gummy shark/Gummy shark.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.dus%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "Dusky Shark.annual.mean.size_relative.csv",row.names = F)
+          "C:/Matias/Analyses/Data_outs/Dusky shark/Dusky shark.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.whis%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "Whiskery Shark.annual.mean.size_relative.csv",row.names = F)
+          "C:/Matias/Analyses/Data_outs/Whiskery shark/Whiskery shark.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.san%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "Sandbar Shark.annual.mean.size_relative.csv",row.names = F)
+          "C:/Matias/Analyses/Data_outs/Sandbar shark/Sandbar shark.annual.mean.size_relative.csv",row.names = F)
 
   
-write.csv(Pred.smh,"Smooth hammerhead.annual.mean.size_relative.csv",row.names = F)
-write.csv(Pred.spi,"Spinner Shark.annual.mean.size_relative.csv",row.names = F)
-write.csv(Pred.tig,"Tiger Shark.annual.mean.size_relative.csv",row.names = F)
+write.csv(Pred.smh%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
+          "C:/Matias/Analyses/Data_outs/Smooth hammerhead/Smooth hammerhead.annual.mean.size_relative.csv",row.names = F)
+write.csv(Pred.spi%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
+          "C:/Matias/Analyses/Data_outs/Spinner shark/Spinner shark.annual.mean.size_relative.csv",row.names = F)
+write.csv(Pred.tig%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
+          "C:/Matias/Analyses/Data_outs/Tiger shark/Tiger shark.annual.mean.size_relative.csv",row.names = F)
+write.csv(Pred.cop%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
+          "C:/Matias/Analyses/Data_outs/Copper shark/Copper shark.annual.mean.size_relative.csv",row.names = F)
 
 
 #by zone
@@ -2053,16 +2071,16 @@ fn.out=function(LisT,NM)
   {
    write.csv(LisT[[l]]%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%
                 select(Finyear,mean,CV),
-              paste(NM,".annual.mean.size_relative_",names(LisT)[l],".csv",sep=""),row.names = F)
+              paste(getwd(),'/',NM,'/',NM,".annual.mean.size_relative_",names(LisT)[l],".csv",sep=""),row.names = F)
   }
 }
 
 fn.out(list(west=Pred.whis_west,zone1=Pred.whis_zn1,zone2=Pred.whis_zn2),
-       NM="Whiskery Shark")
-fn.out(list(zone2=Pred.gum_zn2),NM="Gummy Shark")
+       NM="Whiskery shark")
+fn.out(list(zone2=Pred.gum_zn2),NM="Gummy shark")
 fn.out(list(west=Pred.dus_west,zone1=Pred.dus_zn1,zone2=Pred.dus_zn2),
-       NM="Dusky Shark")
-fn.out(list(west=Pred.san_west,zone1=Pred.san_zn1),NM="Sandbar Shark")
+       NM="Dusky shark")
+fn.out(list(west=Pred.san_west,zone1=Pred.san_zn1),NM="Sandbar shark")
 
 
 
