@@ -14,13 +14,14 @@ library(dplyr)
 Run="Standard"
 
 #---DATA SECTION-----
-setwd("C:/Matias/Analyses/Catch and effort")
+handl_OneDrive=function(x)paste('C:/Users/myb/OneDrive - Department of Primary Industries and Regional Development/Matias',x,sep='/')
+setwd(handl_OneDrive("Analyses/Catch and effort"))
 
 #1. DAILY LOGBOOKS
 Logbook=read.csv("Logbook.data.mean.weight.csv")
 
-Wei.range=read.csv("C:/Matias/Data/Length_Weights/Data.Ranges.csv",stringsAsFactors = F)
-Wei.range.names=read.csv("C:/Matias/Data/Length_Weights/Species.names.csv",stringsAsFactors = F)
+Wei.range=read.csv(handl_OneDrive("Data/Length_Weights/Data.Ranges.csv"),stringsAsFactors = F)
+Wei.range.names=read.csv(handl_OneDrive("Data/Length_Weights/Species.names.csv"),stringsAsFactors = F)
 Wei.range=merge(Wei.range,Wei.range.names,by="Sname",all.x=T)
 
 
@@ -244,7 +245,7 @@ if(Run=="First")
     
   }
   
-  handle="C:/Matias/Analyses/Mean weight/"
+  handle=handl_OneDrive("Analyses/Mean weight/")
   tiff(file=paste(handle,"Mean.data.whiskery.tiff",sep=""),width = 2400, height = 2400,units = "px", res = 300, compression = "lzw")  
   par(mfcol=c(3,1),mar=c(2,3.5,1.5,1),oma=c(1,1,1,1),las=1,mgp=c(2,.7,0))
   fn(subset(Mean.w.whiskery,zone=="West"),subset(Survey.whi,zone=="West"),17003,Max.w.w,Min.w.w,"YES","Whiskery shark")
@@ -332,7 +333,7 @@ if(Run=="First")
          cex=1.5,col="blue",font=2)
     dev.off()
   }
-  handle="C:/Matias/Analyses/Mean weight"
+  handle=handl_OneDrive("Analyses/Mean weight")
   fn.Wght.Freq(-26.5,17003,"GN",MAX.w=Max.w.w,BRK=seq(0,20,by=5),XMAX=Max.w.w,"Whiskery")
   fn.Wght.Freq(-26.5,17001,"GN",MAX.w=Max.w.g,BRK=seq(0,Max.w.g,by=5),XMAX=25,"Gummy")
   fn.Wght.Freq(-26.5,18003,"GN",MAX.w=Max.w.d,BRK=seq(0,Max.w.d,by=5),XMAX=50,"Dusky")
@@ -2041,27 +2042,27 @@ if(Run=="First")
 
 
 # EXPORT QUANTITIES OF INTEREST FOR POP DYN MODEL -------------------------
-setwd('C:\\Matias\\Analyses\\Data_outs')
+setwd(handl_OneDrive('Analyses\\Data_outs'))
 
 #normalised
 write.csv(Pred.gum%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "C:/Matias/Analyses/Data_outs/Gummy shark/Gummy shark.annual.mean.size_relative.csv",row.names = F)
+          "Gummy shark/Gummy shark.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.dus%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "C:/Matias/Analyses/Data_outs/Dusky shark/Dusky shark.annual.mean.size_relative.csv",row.names = F)
+          "Dusky shark/Dusky shark.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.whis%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "C:/Matias/Analyses/Data_outs/Whiskery shark/Whiskery shark.annual.mean.size_relative.csv",row.names = F)
+          "Whiskery shark/Whiskery shark.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.san%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "C:/Matias/Analyses/Data_outs/Sandbar shark/Sandbar shark.annual.mean.size_relative.csv",row.names = F)
+          "Sandbar shark/Sandbar shark.annual.mean.size_relative.csv",row.names = F)
 
   
 write.csv(Pred.smh%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "C:/Matias/Analyses/Data_outs/Smooth hammerhead/Smooth hammerhead.annual.mean.size_relative.csv",row.names = F)
+          "Smooth hammerhead/Smooth hammerhead.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.spi%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "C:/Matias/Analyses/Data_outs/Spinner shark/Spinner shark.annual.mean.size_relative.csv",row.names = F)
+          "Spinner shark/Spinner shark.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.tig%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "C:/Matias/Analyses/Data_outs/Tiger shark/Tiger shark.annual.mean.size_relative.csv",row.names = F)
+          "Tiger shark/Tiger shark.annual.mean.size_relative.csv",row.names = F)
 write.csv(Pred.cop%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "C:/Matias/Analyses/Data_outs/Copper shark/Copper shark.annual.mean.size_relative.csv",row.names = F)
+          "Copper shark/Copper shark.annual.mean.size_relative.csv",row.names = F)
 
 
 #by zone
