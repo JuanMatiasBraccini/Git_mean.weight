@@ -10,8 +10,9 @@ library(arm)  #form pseudo R2
 library(dplyr)
 
 
-#Standard or First run (paper)
+#Select run
 Run="Standard"
+#Run="First"  #used for paper
 
 #---DATA SECTION-----
 if(!exists('handl_OneDrive')) source('C:/Users/myb/OneDrive - Department of Primary Industries and Regional Development/Matias/Analyses/SOURCE_SCRIPTS/Git_other/handl_OneDrive.R')
