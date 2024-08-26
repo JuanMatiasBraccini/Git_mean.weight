@@ -137,7 +137,7 @@ Mean.w.sandbar=subset(Logbook,LAT <= Sandbar.range[1] & LONG <= Sandbar.range[2]
 
   #Core dist for other species with data
 Other.species=c(19000,18023,18022,18001)
-Mean.w.smooth.HH=subset(Logbook,species== 19000 & LONG>=115 & LONG<=128 & LAT<=(-32) & LAT>=(-35))
+Mean.w.smooth.HH=subset(Logbook,species== 19004 & LONG>=115 & LONG<=128 & LAT<=(-32) & LAT>=(-35))
 Mean.w.Spinner=subset(Logbook,species== 18023 & LONG>=113 & LONG<=119 & LAT<=(-27) & LAT>=(-35))
 Mean.w.Tiger=subset(Logbook,species== 18022 & LONG>=113 & LONG<=116 & LAT<=(-27) & LAT>=(-34))
 Mean.w.Copper=subset(Logbook,species== 18001 & LONG>=115 & LONG<=129 & LAT<=(-31) & LAT>=(-35))
@@ -633,7 +633,7 @@ Gum.blks=fn.block.cum(Agg.w.gummy,17001,Threshold,Max.w.g,Min.w.g)
 Dus.blks=fn.block.cum(Agg.w.dusky,18003,Threshold,Max.w.d,Min.w.d)
 San.blks=fn.block.cum(Agg.w.sandbar,18007,Threshold,Max.w.s,Min.w.s)
 
-SH.blks=fn.block.cum(Agg.w.smooth.HH,19000,Threshold,Max.w.sH,Min.w.sH)
+SH.blks=fn.block.cum(Agg.w.smooth.HH,19004,Threshold,Max.w.sH,Min.w.sH)
 Spin.blks=fn.block.cum(Agg.w.Spinner,18023,Threshold,Max.w.Sp,Min.w.Sp)
 Tig.blks=fn.block.cum(Agg.w.Tiger,18022,Threshold,Max.w.Tig,Min.w.Tig)
 Cop.blks=fn.block.cum(Agg.w.Copper,18001,Threshold,Max.w.d,Min.w.d)
@@ -2046,43 +2046,30 @@ if(Run=="First")
 # EXPORT QUANTITIES OF INTEREST FOR POP DYN MODEL -------------------------
 setwd(handl_OneDrive('Analyses\\Data_outs'))
 
-#normalised
-write.csv(Pred.gum%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "Gummy shark/Gummy shark.annual.mean.size_relative.csv",row.names = F)
-write.csv(Pred.dus%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "Dusky shark/Dusky shark.annual.mean.size_relative.csv",row.names = F)
-write.csv(Pred.whis%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "Whiskery shark/Whiskery shark.annual.mean.size_relative.csv",row.names = F)
-write.csv(Pred.san%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "Sandbar shark/Sandbar shark.annual.mean.size_relative.csv",row.names = F)
+  #zones combined
+write.csv(Pred.gum%>%rename(mean=Pred.mean)%>%dplyr::select(Finyear,mean,CV),"Gummy shark/Gummy shark.annual.mean.size.csv",row.names = F)
+write.csv(Pred.dus%>%rename(mean=Pred.mean)%>%dplyr::select(Finyear,mean,CV),"Dusky shark/Dusky shark.annual.mean.size.csv",row.names = F)
+write.csv(Pred.whis%>%rename(mean=Pred.mean)%>%dplyr::select(Finyear,mean,CV),"Whiskery shark/Whiskery shark.annual.mean.size.csv",row.names = F)
+write.csv(Pred.san%>%rename(mean=Pred.mean)%>%dplyr::select(Finyear,mean,CV),"Sandbar shark/Sandbar shark.annual.mean.size.csv",row.names = F)
 
-  
-write.csv(Pred.smh%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "Smooth hammerhead/Smooth hammerhead.annual.mean.size_relative.csv",row.names = F)
-write.csv(Pred.spi%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "Spinner shark/Spinner shark.annual.mean.size_relative.csv",row.names = F)
-write.csv(Pred.tig%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "Tiger shark/Tiger shark.annual.mean.size_relative.csv",row.names = F)
-write.csv(Pred.cop%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%select(Finyear,mean,CV),
-          "Copper shark/Copper shark.annual.mean.size_relative.csv",row.names = F)
+write.csv(Pred.smh%>%rename(mean=Pred.mean)%>%dplyr::select(Finyear,mean,CV),"Smooth hammerhead/Smooth hammerhead.annual.mean.size.csv",row.names = F)
+write.csv(Pred.spi%>%rename(mean=Pred.mean)%>%dplyr::select(Finyear,mean,CV), "Spinner shark/Spinner shark.annual.mean.size.csv",row.names = F)
+write.csv(Pred.tig%>%rename(mean=Pred.mean)%>%dplyr::select(Finyear,mean,CV),"Tiger shark/Tiger shark.annual.mean.size.csv",row.names = F)
+write.csv(Pred.cop%>%rename(mean=Pred.mean)%>%dplyr::select(Finyear,mean,CV),"Copper shark/Copper shark.annual.mean.size.csv",row.names = F)
 
 
-#by zone
+  #by zone 
 fn.out=function(LisT,NM)
 {
   for(l in 1:length(LisT))
   {
-   write.csv(LisT[[l]]%>%mutate(mean=Pred.mean/mean(Pred.mean))%>%
-                select(Finyear,mean,CV),
-              paste(getwd(),'/',NM,'/',NM,".annual.mean.size_relative_",names(LisT)[l],".csv",sep=""),row.names = F)
+   write.csv(LisT[[l]]%>%rename(mean=Pred.mean)%>%dplyr::select(Finyear,mean,CV),
+              paste(getwd(),'/',NM,'/',NM,".annual.mean.size_",names(LisT)[l],".csv",sep=""),row.names = F)
   }
 }
-
-fn.out(list(west=Pred.whis_west,zone1=Pred.whis_zn1,zone2=Pred.whis_zn2),
-       NM="Whiskery shark")
+fn.out(list(west=Pred.whis_west,zone1=Pred.whis_zn1,zone2=Pred.whis_zn2),NM="Whiskery shark")
 fn.out(list(zone2=Pred.gum_zn2),NM="Gummy shark")
-fn.out(list(west=Pred.dus_west,zone1=Pred.dus_zn1,zone2=Pred.dus_zn2),
-       NM="Dusky shark")
+fn.out(list(west=Pred.dus_west,zone1=Pred.dus_zn1,zone2=Pred.dus_zn2),NM="Dusky shark")
 fn.out(list(west=Pred.san_west,zone1=Pred.san_zn1),NM="Sandbar shark")
 
 
